@@ -1,4 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  memo,
+  useCallback,
+} from "react";
 
 const readme = (
   <div>
@@ -13,6 +20,17 @@ const readme = (
   </div>
 );
 
+const sampleApiCall = () => {
+  console.log("called");
+};
+
+const SampleComp = (props) => {
+  console.log("rendering");
+  return <div>sampel compo</div>;
+};
+
+const SampleCompMemo = memo(SampleComp);
+
 function UserRegisterationForm() {
   const [name, setName] = useState("");
   const [isMarried, setIsMarried] = useState("");
@@ -25,10 +43,13 @@ function UserRegisterationForm() {
     resultContainertRef.current.textContent = JSON.stringify(result);
   };
 
+  const onSubmitCB = useCallback(onSubmit, []);
+
   useEffect(() => {
     nameInputRef.current.focus();
   }, []);
 
+  sampleApiCall();
   return (
     <div>
       <h4>User Registration form</h4>
@@ -38,7 +59,10 @@ function UserRegisterationForm() {
           ref={nameInputRef}
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            console.log("cahnge", e.target.value);
+            setName(e.target.value);
+          }}
         />
       </div>
 
@@ -55,7 +79,14 @@ function UserRegisterationForm() {
         <button onClick={onSubmit}>Submit</button>
       </div>
 
+      {name === "vik" ? (
+        <div>this is vikash</div>
+      ) : (
+        <div>this is not vikash</div>
+      )}
       <div ref={resultContainertRef}></div>
+
+      <SampleCompMemo name={name} onSubmit={onSubmitCB} />
     </div>
   );
 }

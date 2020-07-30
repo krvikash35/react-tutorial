@@ -52,6 +52,8 @@ const C4 = () => {
 
 const C3 = () => {
   const { name } = useContext(userContext);
+  const a = useContext(userContext);
+  console.log("a", a);
   return (
     <div className="comp">
       c3

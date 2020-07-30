@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
+
 import "./App.css";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, Link, Redirect } from "react-router-dom";
 import HelloWorldPage from "./pages/hello-world";
 import PropsStatePage from "./pages/props-state";
 import ContextPage from "./pages/context";
 import InputEventPage from "./pages/input-event";
 import LifecyclePage from "./pages/lifycycle";
-import RoutingPage from "./pages/routing";
+import ReduxPage from "./pages/redux";
+import DashboardPage from "./pages/protected-routing-1";
+import ProfilePage from "./pages/protected-routing-2";
+import LoginPage from "./pages/login";
+import { UserContextProvider, userContext } from "./user-context";
 
 function SideBar() {
   return (
@@ -16,10 +21,35 @@ function SideBar() {
       <Link to="/lifecycle">Component Lifycycle </Link>
       <Link to="/input-event">Input and Event</Link>
       <Link to="/context">Context</Link>
-      <Link to="/routing">Routing</Link>
+      <Link to="/redux">Redux</Link>
+      <Link to="/dashboard">Protected Route 1: dashboard</Link>
+      <Link to="/profile">Protected Route 2: profile</Link>
     </div>
   );
 }
+
+const PrivateRoute = (props) => {
+  const { children, ...rest } = props;
+  const { isLoggedin } = useContext(userContext);
+
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        isLoggedin ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location },
+            }}
+          />
+        )
+      }
+    />
+  );
+};
 
 function Content() {
   return (
@@ -45,9 +75,23 @@ function Content() {
           <LifecyclePage />
         </Route>
 
-        <Route path="/routing">
-          <RoutingPage />
+        <Route path="/redux">
+          <ReduxPage />
         </Route>
+
+        <PrivateRoute path="/dashboard">
+          <DashboardPage />
+        </PrivateRoute>
+
+        <PrivateRoute path="/profile">
+          <ProfilePage />
+        </PrivateRoute>
+
+        <Route path="/login">
+          <LoginPage />
+        </Route>
+
+        <Route>Not found</Route>
       </Switch>
     </div>
   );
@@ -55,10 +99,12 @@ function Content() {
 
 function App() {
   return (
-    <div className="app">
-      <SideBar />
-      <Content />
-    </div>
+    <UserContextProvider>
+      <div className="app">
+        <SideBar />
+        <Content />
+      </div>
+    </UserContextProvider>
   );
 }
 
